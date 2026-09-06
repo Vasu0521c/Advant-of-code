@@ -6,11 +6,11 @@ def calculate_floor_p1(reader, size):
     while i < size:
         chr = reader.read(1)
 
-        if chr == '\n':
+        if chr == b'\n':
             i += 1
             continue
 
-        if chr == '(':
+        if chr == b'(':
             floor += 1
         else:
             floor -= 1
@@ -30,11 +30,11 @@ def calculate_floor_p2(reader, size):
         if floor == -1:
             return i
 
-        if chr == '\n':
+        if chr == b'\n':
             i += 1
             continue
 
-        if chr == '(':
+        if chr == b'(':
             floor += 1
         else:
             floor -= 1
@@ -49,10 +49,11 @@ def size_of_file(file):
     return size
 
 def main():
-    with open("../inputs/C2015day1.txt", "rb") as reader:
+    with open("../inputs/2015day1.txt", 'rb') as reader:
         size = size_of_file(reader)
+        reader.seek(0, 0)
         result1 = calculate_floor_p1(reader, size);
-        reader = seek(0, 0)
+        reader.seek(0, 0)
         result2 = calculate_floor_p2(reader, size);
         print("Floor :", result1)
         print("Floor :", result2)
