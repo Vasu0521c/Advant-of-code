@@ -11,6 +11,21 @@ struct arr_set {
 };
 
 
+int get_max(int *arr, int n) {
+
+    int value = 0;
+    int i = 0;
+    while (i < n) {
+
+        if (value < arr[i])
+            value = arr[i];
+
+        i++;
+    }
+    return value;
+}
+
+
 int get_full_value(char **actual) {
 
     char *input = *actual;
@@ -39,7 +54,7 @@ int get_total_deers(FILE *ptr) {
 int get_value(arr_set arrs, int index, int time) {
 
     int value = 0;
-    int temp_time = time % arrs.rest_arr[index];
+    int temp_time = time % (arrs.time_arr[index] + arrs.rest_arr[index]);
 
     if (temp_time > 0 && temp_time <= arrs.time_arr[index]) {
         value = arrs.speed_arr[index];
@@ -51,55 +66,57 @@ int get_value(arr_set arrs, int index, int time) {
 
 int full_brute_force(arr_set arrs, int time, int n_deers) {
 
-    int result, max, dis_cover, remain;
-    int indi_value[n_deers] = {};
+    int result, max, dis_cover, remain, end_time;
+    int indi_value[n_deers], indi_points[n_deers];
     int i = 0;
+
+    end_time = time;
+    time = 1;
 
     while (i < n_deers) {
         indi_value[i] = 0;
+        indi_points[i] = 0;
         i++;
     }
 
-    while (time--) {
+    while (time < end_time) {
         i = 0;
+
         while (i < n_deers) {
             indi_value[i] += get_value(arrs, i, time);
             i++;
         }
-        max = 0;
         i = 0;
-        while (i < n_deers) {
+        max = get_max(indi_value, n_deers);
 
-            if (max < indi_value[i])
-                max = indi_value[i];
-
-            i++;
-        }
-        i = 0;
         while (i < n_deers) {
 
             if (max == indi_value[i])
-                indi_value[i]++;
+                indi_points[i]++;
 
             i++;
         }
+        time++;
     }
-    max = 0;
-    i = 0;
+
+    i = max = 0;
     while (i < n_deers) {
 
-        if (max < indi_value[i])
-            max = indi_value[i];
+        if (max < (indi_value[i] + indi_points[i])) {
+            max = indi_value[i] + indi_points[i];
+            result = i;
+        }
 
         i++;
     }
-    return max;
+
+    return indi_points[result];
 }
 
 
 int get_max_distance_covered(arr_set arrs, int time, int n_deers) {
     
-    int result, max, indi_value, dis_cover, remain;
+    int max, indi_value, dis_cover, remain;
     int i = 0;
     max = 0;
 
@@ -114,16 +131,18 @@ int get_max_distance_covered(arr_set arrs, int time, int n_deers) {
         if (remain <= arrs.time_arr[i]) {
             indi_value += arrs.speed_arr[i] * remain;
         }
+
         else if (remain > arrs.time_arr[i])
             indi_value += arrs.speed_arr[i] * arrs.time_arr[i];
 
-        if (max < indi_value)
+        if (max < indi_value) {
             max = indi_value;
+        }
+
         i++;
     }
 
-    result = max;
-    return result;
+    return max;
 }
 
 
