@@ -45,8 +45,10 @@ int get_total_deers(FILE *ptr) {
 
     int  count = 0;
     char buff[100];
+
     while (fgets(buff, sizeof(buff), ptr) != NULL)
         count++;
+
     return count;
 }
 
@@ -93,7 +95,6 @@ int full_brute_force(arr_set arrs, int time, int n_deers) {
 
             if (max == indi_value[i])
                 indi_points[i]++;
-
             i++;
         }
         time++;
@@ -104,13 +105,13 @@ int full_brute_force(arr_set arrs, int time, int n_deers) {
 
         if (max < (indi_value[i] + indi_points[i])) {
             max = indi_value[i] + indi_points[i];
-            result = i;
+            result = indi_points[i];
         }
 
         i++;
     }
 
-    return indi_points[result];
+    return result;
 }
 
 
