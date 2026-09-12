@@ -4,6 +4,74 @@
 
 typedef int16_t byte;
 
+void display_arr(byte **arr) {
+
+    byte i, j;
+    i = 0;
+    while (i < 4) {
+        j = 0;
+        while (j < 5) {
+            printf("%d  ", arr[i][j]);
+            j++;
+        }
+        i++;
+        printf("\n");
+    }
+}
+
+int less_much_brute_force(byte **arr, byte limit) {
+
+    int  result = 0;
+    int  max    = 0;
+    int  cap, dur, fla, tex, cal;
+    byte l;
+
+    for (byte i = 0; i < limit; i++) {
+        for (byte j = 0; j < limit - i; j++) {
+            for (byte k = 0; k < limit - j; k++) {
+
+                l = limit - i - j - k;
+
+                cal = (i * arr[0][4]) +
+                      (j * arr[1][4]) +
+                      (k * arr[2][4]) +
+                      (l * arr[3][4]);
+
+                if (cal != 500)
+                    continue;
+
+                cap = (i * arr[0][0]) +
+                      (j * arr[1][0]) +
+                      (k * arr[2][0]) +
+                      (l * arr[3][0]);
+
+                dur = (i * arr[0][1]) +
+                      (j * arr[1][1]) +
+                      (k * arr[2][1]) +
+                      (l * arr[3][1]);
+
+                fla = (i * arr[0][2]) +
+                      (j * arr[1][2]) +
+                      (k * arr[2][2]) +
+                      (l * arr[3][2]);
+
+                tex = (i * arr[0][3]) +
+                      (j * arr[1][3]) +
+                      (k * arr[2][3]) +
+                      (l * arr[3][3]);
+
+                cap = (cap < 0) ? 0 : cap;
+                dur = (dur < 0) ? 0 : dur;
+                fla = (fla < 0) ? 0 : fla;
+                tex = (tex < 0) ? 0 : tex;
+                max = cap * dur * fla * tex;
+                if (result < max)
+                    result = max;
+            }
+        }
+    }
+    return result;
+}
 
 
 int too_much_brute_force(byte **arr, byte limit) {
@@ -38,6 +106,10 @@ int too_much_brute_force(byte **arr, byte limit) {
                       (k * arr[2][3]) +
                       (l * arr[3][3]);
 
+                cap = (cap < 0) ? 0 : cap;
+                dur = (dur < 0) ? 0 : dur;
+                fla = (fla < 0) ? 0 : fla;
+                tex = (tex < 0) ? 0 : tex;
                 max = cap * dur * fla * tex;
                 if (result < max)
                     result = max;
@@ -79,7 +151,7 @@ void process_input(byte **arr, char *input) {
 
 byte **create_array(byte **arr, byte cols, byte rows) {
 
-    arr = malloc(sizeof(byte) * cols);
+    arr = malloc(sizeof(byte *) * cols);
 
     for (int i = 0; i < cols; i++) {
         arr[i] = malloc(sizeof(byte) * rows);
@@ -138,8 +210,12 @@ int main() {
 
     process_input(arr, input);
     result1 = too_much_brute_force(arr, cap);
+    result2 = less_much_brute_force(arr, cap);
 
     printf("Total score of Cookie : %d\n", result1);
+    printf("Total score with 500 calories : %d\n", result2);
+
+    /* display_arr(arr); */
 
     byte i = 1;
 
