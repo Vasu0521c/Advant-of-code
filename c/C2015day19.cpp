@@ -118,17 +118,26 @@ int operate_on_string(unor_map &dict, std::string &string) {
 int reverse_huh(unor_map &dict, std::string &ac_in) {
     
     std::string string(ac_in);
-    int count = 0;
+    int result, count;
 
-    for (auto &it : dict) {
-        int i = 0;
-        while (true) {
-            i = string.find(it.second, i);
-            if (i == string.npos)
-                break;
-            count++;
+    do {
+        count = 0;
+        for (auto &it : dict) {
+            int i = 0;
+            int len = it.second.length();
+            while (true) {
+                i = string.find(it.second, i);
+
+                if (i == string.npos)
+                    break;
+
+                string.replace(i, len, it.first);
+                count++;
+            }
         }
-    }
+        result += count;
+    } while (count > 0);
+    return result;
 }
 
 int main(void) {
@@ -145,6 +154,7 @@ int main(void) {
     result2 = reverse_huh(dict, ac_in);
 
     std::cout << result1 << "\n";
+    std::cout << result2 << "\n";
 
     free(input);
     return 0;
