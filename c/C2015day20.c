@@ -46,11 +46,35 @@ int get_value(char *input) {
     return result;
 }
 
+int get_presents2(int house, int times) {
+    
+    int result, i, root;
+    result = i = 0;
+    root = (int) sqrt(house);
+
+    while (i < root) {
+        ++i;
+
+        if (house % i == 0) {
+            if (house / i <= 50) 
+                result += i * times;
+            if (i <= 50) 
+                result += (house / i) * times;
+        }
+    }
+
+    if (house % i == 0)
+        if (house / i <= 50) 
+            result += i * times;
+
+    return result;
+}
+
 int get_presents(int house, int times) {
     
     int result, i, root;
     result = i = 0;
-    root = sqrt(house);
+    root = (int) sqrt(house);
 
     while (i < root) {
         i++;
@@ -79,6 +103,18 @@ int find_range(int value) {
     }
 
     return i;
+}
+
+int get_minimum_valueb(int b_v, int value) {
+
+    int i, result;
+
+    result = 0;
+    for (i = b_v; result < value; i++) {
+        result = get_presents2(i, 11);
+    }
+
+    return i - 1;
 }
 
 int get_minimum_value(int value) {
@@ -111,7 +147,9 @@ int main(void) {
     free(input);
 
     result1 = get_minimum_value(value);
+    result2 = get_minimum_valueb(result1, value);
     printf("House number : %d\n", result1);
+    printf("House number : %d\n", result2);
 
     return 0;
 }
