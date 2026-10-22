@@ -46,6 +46,18 @@ int get_value(char *input) {
     return result;
 }
 
+int construct_array(int value, int times) {
+
+    int arr[value] = {};
+    int i = 0;
+    while (i < value) {
+        for (int j = 0; j < value; j++) {
+            arr[j] += arr[j] * times;
+        }
+        arr[i] = arr[i] * 10;
+    }
+}
+
 int get_presents2(int house, int times) {
     
     int result, i, root;
@@ -99,7 +111,7 @@ int find_range(int value) {
     incr   = 100;
 
     for (i = 100; result < value; i += incr) {
-        result = get_presents(i, 10);
+        result = get_presents(i, 20);
     }
 
     return i;
@@ -107,14 +119,14 @@ int find_range(int value) {
 
 int get_minimum_valueb(int b_v, int value) {
 
-    int i, result;
+    int result;
 
     result = 0;
-    for (i = b_v; result < value; i++) {
-        result = get_presents2(i, 11);
+    for (; result < value; b_v++) {
+        result = get_presents2(b_v, 11);
     }
 
-    return i - 1;
+    return b_v - 1;
 }
 
 int get_minimum_value(int value) {
