@@ -20,6 +20,12 @@ typedef struct {
 
 } shop;
 
+typedef struct {
+
+    int result1, result2;
+
+} result;
+
 char *file_operation(void) {
 
     FILE *ptr;
@@ -42,9 +48,9 @@ char *file_operation(void) {
     return input;
 }
 
-stats *get_villain_stats(char *input) {
+stats get_villain_stats(char *input) {
 
-    int arr[4] = {0};
+    int arr[3] = {0};
     int i      = 0;
 
     while (*input != '\0') {
@@ -60,10 +66,7 @@ stats *get_villain_stats(char *input) {
         input++;
     }
 
-    stats *villain  = malloc(sizeof(stats));
-    villain->hp     = arr[0];
-    villain->damage = arr[1];
-    villain->armor  = arr[2];
+    stats villain = {arr[0], arr[2], arr[1]};
     return villain;
 }
 
@@ -89,7 +92,7 @@ items *get_rings(shop *mer) {
     return rings;
 }
 
-_Bool can_defeat(stats *men, stats *villain, int i) {
+_Bool can_defeat(stats *men, stats *villain) {
 
     int mandam, manarm, manhp;
     int vildam, vilarm, vilhp;
@@ -106,6 +109,7 @@ _Bool can_defeat(stats *men, stats *villain, int i) {
 
     vill_diff = vildam - manarm;
     man_diff  = mandam - vilarm;
+
     if (vill_diff <= 0)
         vill_diff = 1;
     if (man_diff <= 0)
@@ -120,31 +124,21 @@ _Bool can_defeat(stats *men, stats *villain, int i) {
     if ((men_turns * man_diff) != vilhp)
         men_turns++;
 
-    if (i) {
-        if (villain_turns < men_turns)
-            return 0;
-
-        return 1;
-    }
-
-    if (villain_turns > men_turns)
+    if (villain_turns < men_turns)
         return 0;
 
     return 1;
 }
 
-int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
+result min_cost_win(shop *mer, stats *men, stats *villain) {
 
     int    cost;
     int    weapon_max, armor_max, all_three;
-    int    min, dummy, total;
+    int    min, max, dummy, total;
     items *rings;
 
-    if (x) {
-        min = 10000000;
-    } else {
-        min = 0;
-    }
+    min = 10000000;
+    max = 0;
 
     rings      = get_rings(mer);
     weapon_max = mer->n_weap;
@@ -154,17 +148,14 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
 
     for (int i = 0; i < mer->n_weap; i++) {
         men->damage = mer->weapon[i].damage;
-        dummy       = can_defeat(men, villain, x);
+        dummy       = can_defeat(men, villain);
+        cost        = mer->weapon[i].cost;
         if (dummy) {
-            cost = mer->weapon[i].cost;
-            if (x) {
-                if (min > cost) {
-                    min = cost;
-                }
-            } else {
-                if (min < cost)
-                    min = cost;
-            }
+            if (min > cost)
+                min = cost;
+        } else {
+            if (max < cost)
+                max = cost;
         }
     }
 
@@ -172,17 +163,14 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
         men->damage = mer->weapon[i].damage;
         for (int j = 0; j < armor_max; j++) {
             men->armor = mer->armor[j].armor;
-            dummy      = can_defeat(men, villain, x);
+            dummy      = can_defeat(men, villain);
+            cost       = (mer->weapon[i].cost) + (mer->armor[j].cost);
             if (dummy) {
-                cost = (mer->weapon[i].cost) + (mer->armor[j].cost);
-                if (x) {
-                    if (min > cost) {
-                        min = cost;
-                    }
-                } else {
-                    if (min < cost)
-                        min = cost;
-                }
+                if (min > cost)
+                    min = cost;
+            } else {
+                if (max < cost)
+                    max = cost;
             }
         }
     }
@@ -191,17 +179,14 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
         for (int k = 0; k < all_three; k++) {
             men->damage = (mer->rings[k].damage) + (mer->weapon[i].damage);
             men->armor  = (mer->rings[k].armor);
-            dummy       = can_defeat(men, villain, x);
+            dummy       = can_defeat(men, villain);
+            cost        = (mer->weapon[i].cost) + (mer->rings[k].cost);
             if (dummy) {
-                cost = (mer->weapon[i].cost) + (mer->rings[k].cost);
-                if (x) {
-                    if (min > cost) {
-                        min = cost;
-                    }
-                } else {
-                    if (min < cost)
-                        min = cost;
-                }
+                if (min > cost)
+                    min = cost;
+            } else {
+                if (max < cost)
+                    max = cost;
             }
         }
     }
@@ -210,17 +195,14 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
         for (int k = 0; k < total; k++) {
             men->damage = (rings[k].damage) + (mer->weapon[i].damage);
             men->armor  = (rings[k].armor);
-            dummy       = can_defeat(men, villain, x);
+            dummy       = can_defeat(men, villain);
+            cost        = (mer->weapon[i].cost) + (rings[k].cost);
             if (dummy) {
-                cost = (mer->weapon[i].cost) + (rings[k].cost);
-                if (x) {
-                    if (min > cost) {
-                        min = cost;
-                    }
-                } else {
-                    if (min < cost)
-                        min = cost;
-                }
+                if (min > cost)
+                    min = cost;
+            } else {
+                if (max < cost)
+                    max = cost;
             }
         }
     }
@@ -230,19 +212,16 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
             for (int k = 0; k < all_three; k++) {
                 men->armor  = (mer->armor[j].armor) + (mer->rings[k].armor);
                 men->damage = (mer->weapon[i].damage) + (mer->rings[k].damage);
-                dummy       = can_defeat(men, villain, x);
+                dummy       = can_defeat(men, villain);
+                cost        = (mer->weapon[i].cost) +
+                              (mer->armor[j].cost) +
+                              (mer->rings[k].cost);
                 if (dummy) {
-                    cost = (mer->weapon[i].cost) +
-                           (mer->armor[j].cost) +
-                           (mer->rings[k].cost);
-                    if (x) {
-                        if (min > cost) {
-                            min = cost;
-                        }
-                    } else {
-                        if (min < cost)
-                            min = cost;
-                    }
+                    if (min > cost)
+                        min = cost;
+                } else {
+                    if (max < cost)
+                        max = cost;
                 }
             }
         }
@@ -253,32 +232,28 @@ int min_cost_win(shop *mer, stats *men, stats *villain, int x) {
             for (int k = 0; k < total; k++) {
                 men->armor  = (mer->armor[j].armor) + (rings[k].armor);
                 men->damage = (mer->weapon[i].damage) + (rings[k].damage);
-                dummy       = can_defeat(men, villain, x);
+                dummy       = can_defeat(men, villain);
+                cost        = (mer->weapon[i].cost) +
+                              (mer->armor[j].cost) +
+                              (rings[k].cost);
                 if (dummy) {
-                    cost = (mer->weapon[i].cost) +
-                           (mer->armor[j].cost) +
-                           (rings[k].cost);
-                    if (x) {
-                        if (min > cost) {
-                            min = cost;
-                        }
-                    } else {
-                        if (min < cost)
-                            min = cost;
-                    }
+                    if (min > cost)
+                        min = cost;
+                } else {
+                    if (max < cost)
+                        max = cost;
                 }
             }
         }
     }
 
-    return min;
+    result result = {min, max};
+    return result;
 }
 
 int main(void) {
 
     char *input;
-    int   result1, result2;
-
     stats man      = {100, 0, 0};
     items weapon[] = {
         { 8, 4, 0},
@@ -305,13 +280,12 @@ int main(void) {
 
     shop mer       = {weapon, armor, rings, 5, 5, 6};
     input          = file_operation();
-    stats *villain = get_villain_stats(input);
-    result1        = min_cost_win(&mer, &man, villain, 1);
-    result2        = min_cost_win(&mer, &man, villain, 0);
-    free(villain);
-    free(input);
-    printf("%d\n", result1);
-    printf("%d\n", result2);
+    stats  villain = get_villain_stats(input);
+    result result  = min_cost_win(&mer, &man, &villain);
 
+    printf("Part 1 result : %d\n", result.result1);
+    printf("Part 2 result : %d\n", result.result2);
+
+    free(input);
     return 0;
 }
